@@ -1,6 +1,7 @@
 'use strict';
 
-var Optionall = require('../lib/optionall.js');
+var Optionall = require('../lib/optionall.js')
+  , Path = require('path');
 
 /*
   ======== A Handy Little Nodeunit Reference ========
@@ -27,14 +28,37 @@ exports['optionall'] = {
     // setup here
     done();
   },
-  'no args': function(test) {
-    test.expect(1);
+  'standard options': function(test) {
+    test.expect(3);
 
-    //will add tests later
-    console.log(JSON.stringify(new Optionall(), null, 2));
+    var options = new Optionall();
 
-    test.ok(true);
+    test.ok(options.name === 'optionall');
+    test.ok(options.aws.accessKeyId === 'fake');
+    test.ok(options.user === process.env.USER);
 
     test.done();
   },
+  'explicit directory': function(test) {
+    test.expect(3);
+
+    var options = new Optionall(Path.join(process.cwd(), 'node_modules/jsbelt'));
+
+    test.ok(options.name === 'jsbelt');
+    test.ok(!options.aws);
+    test.ok(options.user === process.env.USER);
+
+    test.done();
+  },
+  'production options': function(test) {
+    test.expect(3);
+
+    var options = new Optionall({'env': 'production'});
+
+    test.ok(options.name === 'optionall');
+    test.ok(options.aws.accessKeyId === 'production_fake');
+    test.ok(options.user === process.env.USER);
+
+    test.done();
+  }
 };
