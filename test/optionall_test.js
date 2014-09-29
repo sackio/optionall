@@ -29,19 +29,16 @@ exports['optionall'] = {
     done();
   },
   'standard options': function(test) {
-    test.expect(3);
-
-    var options = new Optionall();
+    var options = new Optionall({__dirname: Path.resolve('./')});
 
     test.ok(options.name === 'optionall');
+
     test.ok(options.aws.accessKeyId === 'fake');
     test.ok(options.user === process.env.USER);
 
     test.done();
   },
   'explicit directory': function(test) {
-    test.expect(3);
-
     var options = new Optionall(Path.join(process.cwd(), 'node_modules/jsbelt'));
 
     test.ok(options.name === 'jsbelt');
@@ -51,13 +48,43 @@ exports['optionall'] = {
     test.done();
   },
   'production options': function(test) {
-    test.expect(3);
+    var options = new Optionall({'env': 'production', '__dirname': Path.resolve('./')});
 
-    var options = new Optionall({'env': 'production'});
+    test.ok(options.environment === 'production');
+    test.ok(options.env === 'production');
+    test.ok(options.NODE_ENV === 'production');
 
     test.ok(options.name === 'optionall');
     test.ok(options.aws.accessKeyId === 'production_fake');
     test.ok(options.user === process.env.USER);
+
+    test.done();
+  },
+  'environment': function(test) {
+    var options = new Optionall({'env': 'production', '__dirname': Path.resolve('./')});
+
+    test.ok(options.environment === 'production');
+    test.ok(options.env === 'production');
+    test.ok(options.NODE_ENV === 'production');
+
+    test.ok(options.name === 'optionall');
+    test.ok(options.aws.accessKeyId === 'production_fake');
+    test.ok(options.user === process.env.USER);
+
+    options = new Optionall({'environment': 'balloon'});
+
+    test.ok(options.environment === 'balloon');
+    test.ok(options.env === 'balloon');
+    test.ok(options.NODE_ENV === 'balloon');
+
+    process.env.NODE_ENV = 'something';
+    process.env.ENV = 'something';
+
+    options = new Optionall();
+
+    test.ok(options.environment === 'something');
+    test.ok(options.env === 'something');
+    test.ok(options.NODE_ENV === 'something');
 
     test.done();
   }
